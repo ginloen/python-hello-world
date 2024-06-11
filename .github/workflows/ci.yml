@@ -8,7 +8,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     outputs:
-      short-hash: ${{ steps.publish.outputs.get-hash }}
+      short-hash: ${{ steps.publish.outputs.git-hash }}
     steps:
       - name: Checkout the source code
         uses: actions/checkout@v4
@@ -26,7 +26,7 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: python-files-$git_hash
+          name: python-files-${{ steps.publish.outputs.short-hash }}
           path: |
             hello_world.py
             requirements.txt
