@@ -1,11 +1,23 @@
 name: Python Hello World
-on: [push, workflow_dispatch]
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
 jobs:
   build:
     runs-on: ubuntu-latest
+    outputs:
+      short-hash: ${{ steps.publish.outputs.get-hash }}
     steps:
       - name: Checkout the source code
         uses: actions/checkout@v4
+      - name: Publish commit hash
+        id: publish
+        run: |
+          git_hash=$(git rev-parse --short "$GITHUB_SHA")
+          git_branch=${GITHUB_REF_NAME#refs/heads/}
+          echo 'git-hash=$git_hash' >> $GITHUB_OUTPUT ';'
       - name: Restore dependencies
         run: |
           python3 -m pip install --upgrade pip
@@ -13,7 +25,7 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: python-files
+          name: python-files-$git_hash
           path: |
             hello_world.py
             requirements.txt
@@ -24,6 +36,6 @@ jobs:
       - name: Download build artifacts
         uses: actions/download-artifact@v4
         with:
-          name: python-files
-      - name: Run python script
-        run: python3 hello_world.py
+          name: python-files-${{ needs.build.outputs.short-hash }}
+      # - name: Run python script
+      #   run: python3 hello_world.py
