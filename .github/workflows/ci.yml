@@ -23,10 +23,13 @@ jobs:
         run: |
           python3 -m pip install --upgrade pip
           pip install -r requirements.txt
+      - name: Debug artifact name
+        run: |
+          echo "Artifact name: python-files-${{ steps.publish.outputs.short-hash }}"
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: "python-files-${{ steps.publish.outputs.short-hash }}"
+          name: python-files-${{ steps.publish.outputs.short-hash }}
           path: |
             hello_world.py
             requirements.txt
