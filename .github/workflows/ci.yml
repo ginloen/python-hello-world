@@ -8,7 +8,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     outputs:
-      short-hash: ${{ steps.publish.outputs.git-hash }}
+      shortHash: ${{ steps.publish.outputs.gitHash }}
     steps:
       - name: Checkout the source code
         uses: actions/checkout@v4
@@ -17,19 +17,19 @@ jobs:
         run: |
           git_hash=$(git rev-parse --short "$GITHUB_SHA")
           git_branch=${GITHUB_REF#refs/heads/}
-          echo $git_hash
-          echo "git-hash=$git_hash" >> $GITHUB_OUTPUT
+          echo "gitHash=$git_hash" >> "$GITHUB_OUTPUT"
+          echo "gitShortHash=$git_hash" >> "$GITHUB_ENV"
       - name: Restore dependencies
         run: |
           python3 -m pip install --upgrade pip
           pip install -r requirements.txt
       - name: Debug artifact name
         run: |
-          echo "Artifact name: python-files-${{ steps.publish.outputs.short-hash }}"
+          echo "Artifact name: python-files-$gitShortHash"
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: python-files-${{ steps.publish.outputs.short-hash }}
+          name: python-files-$gitShortHash
           path: |
             hello_world.py
             requirements.txt
