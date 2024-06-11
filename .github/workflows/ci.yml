@@ -25,11 +25,11 @@ jobs:
           pip install -r requirements.txt
       - name: Debug artifact name
         run: |
-          echo "Artifact name: python-files-${{ steps.publish.outputs.shortHash }}"
+          echo "Artifact name: python-files-${{ steps.publish.outputs.gitHash}}"
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: python-files-$gitShortHash
+          name: python-files-${{ steps.publish.outputs.gitHash}}
           path: |
             hello_world.py
             requirements.txt
