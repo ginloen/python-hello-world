@@ -18,7 +18,7 @@ jobs:
           git_hash=$(git rev-parse --short "$GITHUB_SHA")
           git_branch=${GITHUB_REF#refs/heads/}
           echo $git_hash
-          echo 'git-hash="$git_hash"' >> $GITHUB_OUTPUT ';'
+          echo "git-hash=$git_hash" >> "$GITHUB_OUTPUT"
       - name: Restore dependencies
         run: |
           python3 -m pip install --upgrade pip
@@ -26,7 +26,7 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: python-files-${{ steps.publish.outputs.short-hash }}
+          name: python-files-$git_hash
           path: |
             hello_world.py
             requirements.txt
