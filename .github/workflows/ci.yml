@@ -25,7 +25,7 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: python-files-$git_hash
+          name: python-files-${{ steps.publish.outputs.short-hash }}
           path: |
             hello_world.py
             requirements.txt
