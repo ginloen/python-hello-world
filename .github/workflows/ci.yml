@@ -19,6 +19,11 @@ jobs:
           git_branch=${GITHUB_REF#refs/heads/}
           echo "gitHash=$git_hash" >> $GITHUB_OUTPUT
           echo $git_hash
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: python-dep-pip-${{ hashFiles('**/requirements.txt') }}
       - name: Restore dependencies
         run: |
           python3 -m pip install --upgrade pip
@@ -41,5 +46,14 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: python-files-${{ needs.build.outputs.shorthash }}
-      # - name: Run python script
-      #   run: python3 hello_world.py
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: python-dep-pip-${{ hashFiles('**/requirements.txt') }}
+      - name: Restore dependencies
+        run: |
+          python3 -m pip install --upgrade pip
+          pip install -r requirements.txt          
+      - name: Run python script
+        run: python3 hello_world.py
