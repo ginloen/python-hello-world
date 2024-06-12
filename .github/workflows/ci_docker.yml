@@ -1,0 +1,69 @@
+name: Docker Hello World
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      shortHash: ${{ steps.publish.outputs.gitHash }}
+    steps:
+      - name: Checkout the source code
+        uses: actions/checkout@v4
+      - name: Publish commit hash
+        id: publish
+        run: |
+          git_hash=$(git rev-parse --short "$GITHUB_SHA")
+          git_branch=${GITHUB_REF#refs/heads/}
+          echo "gitHash=$git_hash" >> $GITHUB_OUTPUT
+          echo $git_hash
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Build and export
+        uses: docker/build-push-action@v5
+        with:
+            context: .
+            file: ./Dockerfile
+            tags: hello/world:${{ steps.publish.outputs.gitHash }}
+            outputs: type=docker,dest=/tmp/hello.tar
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-${{ steps.publish.outputs.gitHash }}
+          path: /tmp/hello.tar    
+  test:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: app-${{ needs.build.outputs.shorthash }}
+          path: /tmp
+      - name: Load Docker image
+        run: |
+          docker load --input /tmp/hello.tar
+          docker run -d hello/world:${{ needs.build.outputs.shorthash }}
+  scan:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+        - name: Download build artifacts
+          uses: actions/download-artifact@v4
+          with:
+            name: app-${{ needs.build.outputs.shorthash }}
+            path: /tmp
+        - name: Load Docker image
+          run: |
+            docker load --input /tmp/hello.tar
+        - name: Run Trivy vulnerability scanner
+          uses: aquasecurity/trivy-action@0.20.0
+          with:
+            image-ref: 'hello/world:${{ steps.publish.outputs.gitHash }}'
+            format: 'table'
+            exit-code: '1'
+            ignore-unfixed: true
+            vuln-type: 'os,library'
+            severity: 'CRITICAL,HIGH'                
