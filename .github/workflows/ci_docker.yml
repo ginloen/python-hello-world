@@ -57,11 +57,6 @@ jobs:
           with:
             name: app-${{ needs.build.outputs.shorthash }}
             path: /tmp
-        - name: ls /tmp for debugging
-          run: |
-            ls /tmp
-            docker load --input /tmp/hello.tar
-            docker images ls
         - name: Run Trivy vulnerability scanner
           uses: aquasecurity/trivy-action@0.20.0
           with:
