@@ -58,9 +58,16 @@ jobs:
             name: app-${{ needs.build.outputs.shorthash }}
             path: /tmp
         - name: ls /tmp for debugging
-          run: ls /tmp
-        - name: Run Trivy vulnerability scanner in tarball mode
+          run: |
+            ls /tmp
+            docker load --input /tmp/hello.tar
+            docker images ls
+        - name: Run Trivy vulnerability scanner
           uses: aquasecurity/trivy-action@0.20.0
           with:
-            input: /tmp/hello.tar
-            severity: 'CRITICAL,HIGH'              
+            image-ref: 'hello/world:${{ needs.build.outputs.shorthash }}'
+            format: 'table'
+            exit-code: '1'
+            ignore-unfixed: true
+            vuln-type: 'os,library'
+            severity: 'CRITICAL,HIGH'          
