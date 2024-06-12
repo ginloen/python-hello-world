@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 from art import *
 
-def goodbye_world():
-    tprint("Goodbye World")
-    return "Goodbye World"
+def hello_world():
+    tprint("Hello World")
+    return "Hello World"
 
 if __name__ == "__main__":
-    print(goodbye_world())
+    print(hello_world())
