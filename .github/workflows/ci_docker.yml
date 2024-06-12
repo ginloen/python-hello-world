@@ -43,9 +43,9 @@ jobs:
           name: app-${{ needs.build.outputs.shorthash }}
           path: /tmp
       - name: Load Docker image
-        run: |
-          docker load --input /tmp/hello.tar
-          docker run hello/world:${{ needs.build.outputs.shorthash }}
+        run: docker load --input /tmp/hello.tar
+      - name: Run Docker image
+        run: docker run hello/world:${{ needs.build.outputs.shorthash }}
   scan:
     needs: build
     runs-on: ubuntu-latest
@@ -55,9 +55,6 @@ jobs:
           with:
             name: app-${{ needs.build.outputs.shorthash }}
             path: /tmp
-        - name: Load Docker image
-          run: |
-            docker load --input /tmp/hello.tar
         - name: Run Trivy vulnerability scanner in tarball mode
           uses: aquasecurity/trivy-action@0.20.0
           with:
